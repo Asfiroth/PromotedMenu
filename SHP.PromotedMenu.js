@@ -69,6 +69,7 @@
 		var lists = webSite.get_lists();
 		var tileWidth = 160;
 		var tileMargin = 10;
+		var tilesPerView = 4;
 
 		var principalMenuList;
 		var subMenuList;
@@ -204,12 +205,64 @@
       		$('.c2').mouseover(inMouse).mouseout(outMouse);
 		}
 
+		function advance(){
+			var btn = $(this);
+			var notVisible = $(".submenu div.c1").filter(function () {
+       			return $(this).position().left + $(this).width() > maxh;
+   			}).length;
+			notVisible = (notVisible > tilesPerView) ? tilesPerView : notVisible;
+   			$('.submenu').animate({ 
+   				marginLeft: parseInt($('.submenu').css('marginLeft'), tileMargin) - (notVisible * tileWidth) 
+   			},
+   			function(){
+      			if($('.last').isOnScreen()){
+       				btn.children('span').removeClass('active').addClass('not-active');
+       				btn.unbind('click');
+   				}
+   				if($('.a').children('span').hasClass('not-active')) 
+   				{
+       				$('.a').children('span').removeClass('not-active').addClass('active');
+       				$('.a').on('click', goBack);
+   				}	        	
+			});
+		}
 
+		function goBack(){
+			var btn = $(this);
+			var notVisible = $(".submenu div.c1").filter(function () {
+       			return $(this).position().left < 0;
+   			}).length;
+    		notVisible = (notVisible > tilesPerView) ? tilesPerView : notVisible;
+    		$('.submenu').animate({ 
+    			marginLeft: parseInt($('.submenu').css('marginLeft'), tileMargin) + (notVisible * tileWidth) 
+    		}, 
+    		function(){
+    			if($('.first').isOnScreen()){
+       				btn.children('span').removeClass('active').addClass('not-active');
+       				btn.unbind('click');
+     			}
+   				if($('.s').children('span').hasClass('not-active'))
+   				{
+       				$('.s').children('span').removeClass('not-active').addClass('active');        	
+       				$('.s').on('click', advance);
+   				}
+   			});
+		}
 
 		function subMenuListOut(sender){
     		$('.submenu').slideUp(500);
     		$('.sm').slideUp(500);
     		$('.menu li').removeClass('selected');
+		}
+
+		function inMouse(){
+ 			var link = $(this).parent().find('div.link').stop();
+    		link.animate({ top : 0 }, 250);
+		}
+		
+		function outMouse(){
+    		var link = $(this).parent().find('div.link').stop();
+    		link.animate({ top : 100 }, 250);
 		}
 
 		function onQueryFailed(sender, args) {    
